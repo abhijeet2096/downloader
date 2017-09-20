@@ -6,13 +6,18 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
+#include <pthread.h>
 
 void merger(char ** finalcat,char name[150]){
   freopen(name,"w",stdout);
   printf("Merging !");
   execvp("/bin/cat",finalcat);
 }
+
+struct v {
+   int i; // row
+   int j; // column
+};
 
 int main(int argc, char *argv[]){
 
@@ -88,7 +93,7 @@ int main(int argc, char *argv[]){
 		      strcpy(finalcurl[cnt1],url);
 		      //sprintf(buffer, "%d", 0-);
  			  strcpy(finalcurl[2],"0");
- 			  pid_t pid[processNummber];
+ 			 pthread_t *tid = (pthread_t *)malloc(processNummber*sizeof(pthread_t));
  				while(count < processNummber)
  					{
  						strcpy(file_copy4,file_copy2);
@@ -132,27 +137,36 @@ int main(int argc, char *argv[]){
 						// printf("\nargument 3 for curl  :: %s",finalcurl[2]);
 						strcpy(finalcurl[4],file_copy4);
 		                cnt++;
- 						pid[count] =fork();
- 						//argv[]
-                        if(pid[count] < 0)
-                        {
-                          printf("\nForking Failed !\n");
-                          abort();
-                        }
-                        else if(pid[count]==0)
-                         {
+ 						// pid[count] =fork();
+ 						// //argv[]
+       //                  if(pid[count] < 0)
+       //                  {
+       //                    printf("\nForking Failed !\n");
+       //                    abort();
+       //                  }
+       //                  else if(pid[count]==0)
+       //                   {
 
-                           execvp("/usr/bin/curl",finalcurl);
-                         }
-                        else
-                        {
+       //                     execvp("/usr/bin/curl",finalcurl);
+       //                   }
+       //                  else
+       //                  {
                           
-                        }
+       //                  }
                         //printf("\n\n\n\n");
 
+
+		                struct v *data = (struct v *) malloc(sizeof(struct v));
+		                data->i = i;
+                        data->j = j;
+
+                        pthread_create(&tid[x],NULL, multiply_matrix_helper, data);
                         count++ ;
                       }
-                     while(wait(NULL) > 0);
+                    for (int jk = 0; jk < processNummber; jk++)
+				    {
+				       pthread_join(tid[jk],NULL);
+				    }
 
                 // for (int km = 0; km < processNummber + 1; km++) {
                 //       printf("\n%s",finalcat[km]);
